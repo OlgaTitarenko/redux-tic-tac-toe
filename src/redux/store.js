@@ -15,6 +15,7 @@ const rootReduser = (state = initialState, action) => {
         case NEW_GAME :
             return  initialState;
         case ONE_MOVE:
+            console.log('222');
             const square = state.squares.slice();
             let value;
             if ((state.move + 1) % 2 === 0) {
@@ -25,12 +26,12 @@ const rootReduser = (state = initialState, action) => {
             square[action.payload] = value;
             return {
                 ...state,
-                squares: square,
+             //   squares: square,
                 move: state.move+1,
-                history: {
-                    ...state.history,
-                    [state.move + 1] : square,
-                }
+             //   history: {
+             //       ...state.history,
+             //       [state.move + 1] : square,
+             //   }
             };
         case MOVE_BACK:
             if (state.move === 0 ) {

@@ -7,6 +7,9 @@ import  Reset from './Reset';
 import { ACTION_NEW_GAME, ACTION_ONE_MOVE, ACTION_MOVE_BACK } from '../redux/actions';
 
 class Board extends React.Component {
+   componentDidMount() {
+       this.props.onNewGame();
+   };
 
     handleOnBack = (move) => {
         this.props.onBackMove(move);
@@ -17,6 +20,7 @@ class Board extends React.Component {
         if (calculateWinner(square).winner || square[i]) {
             return;
         }
+        console.log('111');
         this.props.onNewMove(i);
     };
 
@@ -25,23 +29,21 @@ class Board extends React.Component {
     };
 
     renderSquare(i,winLine) {
-        let winClass ='';
+        let winClass = '';
         if (winLine) {
-            winClass = (winLine.indexOf(i) !== -1) ?
-                'winner_line' : '';
+            winClass = (winLine.indexOf(i) !== -1)
+                ? 'winner_line' : '';
         }
         return <
             Square
             winClass={winClass}
             value={this.props.squares[i]}
-            onClick = {() => this.handleClick(i)}
+            onClick = {this.handleClick(i)}
         />;
     }
 
     render() {
-        const winner = calculateWinner(this.props.squares).winner;
-        let winLine='';
-        let status;
+        const { winner, winLine } = calculateWinner(this.props.squares);
         const moves = 'Move: '+this.props.move;
         let value;
         if ((this.props.move + 1) % 2 === 0) {
@@ -49,16 +51,12 @@ class Board extends React.Component {
         } else  {
             value='X';
         }
+        const status = winner ? 'Winner: '+ winner : 'Next player: '+ value;
         let statusBtn = 'status ';
         if (this.props.move === 0){
             statusBtn += 'btn_hide';
         }
-        if (winner) {
-            status = 'Winner: '+ winner;
-            winLine = calculateWinner(this.props.squares).winLine;
-        } else {
-            status = 'Next player: '+ value;
-        }
+
         return (
             <div>
                 <div className="status">{status}</div>
@@ -83,7 +81,7 @@ class Board extends React.Component {
                 </div>
                 <div  className="new_game_button">
                     <Reset
-                        onClick = {this.handleClickNewGame()}
+                        onClick = {this.handleClickNewGame}
                     />
                 </div >
             </div>
