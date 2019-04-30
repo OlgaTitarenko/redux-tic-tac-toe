@@ -40,3 +40,6 @@ body {
   color: white;
   font-size: 18px;
 }
+.btn_hide {
+  display: none;
+}

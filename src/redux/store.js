@@ -1,8 +1,6 @@
-import { createStore} from 'redux';
+import { createStore } from 'redux';
 
-export const NEW_GAME = 'NEW_GAME';
-export const ONE_MOVE = 'ONE_MOVE';
-export const MOVE_BACK = 'MOVE_BACK';
+import  { NEW_GAME, MOVE_BACK, ONE_MOVE} from './actions';
 
 const initialState = {
     squares: Array(9).fill(null),
@@ -12,7 +10,7 @@ const initialState = {
     move: 0
 };
 
-const rootReduser = (state=initialState, action) => {
+const rootReduser = (state = initialState, action) => {
     switch (action.type) {
         case NEW_GAME :
             return  initialState;
@@ -24,8 +22,7 @@ const rootReduser = (state=initialState, action) => {
             } else  {
                 value='X';
             }
-            square[action.position] =  value;
-
+            square[action.payload] = value;
             return {
                 ...state,
                 squares: square,
@@ -36,12 +33,19 @@ const rootReduser = (state=initialState, action) => {
                 }
             };
         case MOVE_BACK:
-             delete (state.history[action.move]);
+            if (state.move === 0 ) {
+                return initialState;
+            }
+            let history = {};
+            for (let key in state.history) {
+                history[key] = state.history[key];
+            }
+            delete (history[action.payload]);
             return {
                 ...state,
-                move: action.move-1,
-                history: state.history,
-                squares: state.history[action.move - 1],
+                move: action.payload-1,
+                history: history,
+                squares: state.history[action.payload - 1],
             };
         default :
             return state;

@@ -4,27 +4,25 @@ import { connect } from 'react-redux';
 import Square from './Square';
 import  Reset from './Reset';
 
-import {ONE_MOVE, NEW_GAME, MOVE_BACK} from '../redux/store';
+import { ACTION_NEW_GAME, ACTION_ONE_MOVE, ACTION_MOVE_BACK } from '../redux/actions';
 
 class Board extends React.Component {
-    componentDidMount() {
-       this.props.onNewGame();
-    }
 
-    handleOnBack(move) {
+    handleOnBack = (move) => {
         this.props.onBackMove(move);
-    }
-    handleClick(i) {
+    };
+
+    handleClick = (i) => {
         const square = this.props.squares.slice();
         if (calculateWinner(square).winner || square[i]) {
             return;
         }
         this.props.onNewMove(i);
-    }
+    };
 
-    handleClickNewGame() {
+    handleClickNewGame = () => {
         this.props.onNewGame();
-    }
+    };
 
     renderSquare(i,winLine) {
         let winClass ='';
@@ -51,7 +49,10 @@ class Board extends React.Component {
         } else  {
             value='X';
         }
-
+        let statusBtn = 'status ';
+        if (this.props.move === 0){
+            statusBtn += 'btn_hide';
+        }
         if (winner) {
             status = 'Winner: '+ winner;
             winLine = calculateWinner(this.props.squares).winLine;
@@ -62,10 +63,9 @@ class Board extends React.Component {
             <div>
                 <div className="status">{status}</div>
                 <div className="status">{moves}</div>
-                <div className="status">
-                    <button onClick={() => this.handleOnBack(this.props.move)}>BACK</button>
+                <div className={statusBtn}>
+                    <button onClick={this.handleOnBack(this.props.move)}>BACK</button>
                 </div>
-
                 <div className="board-row">
                     {this.renderSquare(0,winLine)}
                     {this.renderSquare(1,winLine)}
@@ -83,49 +83,35 @@ class Board extends React.Component {
                 </div>
                 <div  className="new_game_button">
                     <Reset
-                        onClick = {() => this.handleClickNewGame()}
+                        onClick = {this.handleClickNewGame()}
                     />
                 </div >
             </div>
-
         );
     }
 }
-const mapState = (state) => {
-    return {
-        squares: state.squares,
-        move: state.move,
-        history: state.history,
-    };
-};
+const mapState = ({ squares, move, history } ) => ( {
+    squares: squares,
+    move: move,
+    history: history,
+});
 
 const mapDispatchToProps = (dispatch) =>{
   return {
        onNewMove: (pos) => {
-           const action = {
-               type: ONE_MOVE,
-               position: pos,
-           };
-           dispatch(action);
+           dispatch(ACTION_ONE_MOVE(pos));
        },
       onNewGame: () => {
-           const action = {
-               type: NEW_GAME
-           };
-           dispatch(action);
+           dispatch(ACTION_NEW_GAME());
       },
       onBackMove: (move) => {
-           const action = {
-               type: MOVE_BACK,
-               move: move,
-           };
-           dispatch(action);
+           dispatch(ACTION_MOVE_BACK(move));
       },
   }
 };
 
 
-export default connect( mapState, mapDispatchToProps)(Board);
+export default connect( mapState, mapDispatchToProps )(Board);
 
 
 function calculateWinner(squares) {
