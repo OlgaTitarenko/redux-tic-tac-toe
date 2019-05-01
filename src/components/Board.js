@@ -2,92 +2,95 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 import Square from './Square';
-import  Reset from './Reset';
 
 import { ACTION_NEW_GAME, ACTION_ONE_MOVE, ACTION_MOVE_BACK } from '../redux/actions';
 
 class Board extends React.Component {
-   componentDidMount() {
-       this.props.onNewGame();
-   };
+ componentDidMount() {
+   this.props.onNewGame();
+ };
 
-    handleOnBack = (move) => {
-        this.props.onBackMove(move);
-    };
+ handleOnBack = () => {
+   this.props.onBackMove();
+ };
 
-    handleClick = (i) => {
-        const square = this.props.squares.slice();
-        if (calculateWinner(square).winner || square[i]) {
-            return;
-        }
-        console.log('111');
-        this.props.onNewMove(i);
-    };
+ handleClick = (event) => {
+   const item = +event.target.dataset.name ;
+   const square = this.props.squares.slice();
 
-    handleClickNewGame = () => {
-        this.props.onNewGame();
-    };
+   if (calculateWinner(square).winner || square[item]) {
+     return;
+   }
+   this.props.onNewMove(item);
+ };
 
-    renderSquare(i,winLine) {
-        let winClass = '';
-        if (winLine) {
-            winClass = (winLine.indexOf(i) !== -1)
-                ? 'winner_line' : '';
-        }
-        return <
-            Square
-            winClass={winClass}
-            value={this.props.squares[i]}
-            onClick = {this.handleClick(i)}
-        />;
-    }
+ handleClickNewGame = () => {
+   this.props.onNewGame();
+ };
 
-    render() {
-        const { winner, winLine } = calculateWinner(this.props.squares);
-        const moves = 'Move: '+this.props.move;
-        let value;
-        if ((this.props.move + 1) % 2 === 0) {
-            value = 'O';
-        } else  {
-            value='X';
-        }
-        const status = winner ? 'Winner: '+ winner : 'Next player: '+ value;
-        let statusBtn = 'status ';
-        if (this.props.move === 0){
-            statusBtn += 'btn_hide';
-        }
+ renderSquare(i, winLine) {
+   const winClass = (winLine) && (winLine.includes(i))
+     ? 'winner_line'
+     : '';
 
-        return (
-            <div>
-                <div className="status">{status}</div>
-                <div className="status">{moves}</div>
-                <div className={statusBtn}>
-                    <button onClick={this.handleOnBack(this.props.move)}>BACK</button>
-                </div>
-                <div className="board-row">
-                    {this.renderSquare(0,winLine)}
-                    {this.renderSquare(1,winLine)}
-                    {this.renderSquare(2,winLine)}
-                </div>
-                <div className="board-row">
-                    {this.renderSquare(3,winLine)}
-                    {this.renderSquare(4,winLine)}
-                    {this.renderSquare(5,winLine)}
-                </div>
-                <div className="board-row">
-                    {this.renderSquare(6,winLine)}
-                    {this.renderSquare(7,winLine)}
-                    {this.renderSquare(8,winLine)}
-                </div>
-                <div  className="new_game_button">
-                    <Reset
-                        onClick = {this.handleClickNewGame}
-                    />
-                </div >
-            </div>
-        );
-    }
+   return <Square
+     index={i}
+     winClass={winClass}
+     value={this.props.squares[i]}
+     onClick={this.handleClick}
+   />;
+ }
+
+ render() {
+   const { winner, winLine } = calculateWinner(this.props.squares);
+   const moves = 'Move: '+ this.props.move;
+
+   const value = ((this.props.move + 1) % 2 === 0)
+     ? 'O'
+     : 'X' ;
+
+   const status = winner
+     ? 'Winner: '+ winner
+     : 'Next player: '+ value;
+
+   const statusBtn = (this.props.move === 0)
+     ? 'status btn_hide'
+     : 'status';
+
+   return (
+     <div>
+       <div className="status">{status}</div>
+       <div className="status">{moves}</div>
+       <div className={statusBtn}>
+         <button onClick={this.handleOnBack}>BACK</button>
+       </div>
+       <div className="board-row">
+         {this.renderSquare(0,winLine)}
+         {this.renderSquare(1,winLine)}
+         {this.renderSquare(2,winLine)}
+       </div>
+       <div className="board-row">
+         {this.renderSquare(3,winLine)}
+         {this.renderSquare(4,winLine)}
+         {this.renderSquare(5,winLine)}
+       </div>
+       <div className="board-row">
+         {this.renderSquare(6,winLine)}
+         {this.renderSquare(7,winLine)}
+         {this.renderSquare(8,winLine)}
+       </div>
+       <div  className="new_game_button">
+         <button
+           onClick={this.handleClickNewGame}
+         >
+           New Game
+         </button>
+       </div >
+     </div>
+   );
+ }
 }
+
 const mapState = ({ squares, move, history } ) => ( {
     squares: squares,
     move: move,
@@ -96,15 +99,9 @@ const mapState = ({ squares, move, history } ) => ( {
 
 const mapDispatchToProps = (dispatch) =>{
   return {
-       onNewMove: (pos) => {
-           dispatch(ACTION_ONE_MOVE(pos));
-       },
-      onNewGame: () => {
-           dispatch(ACTION_NEW_GAME());
-      },
-      onBackMove: (move) => {
-           dispatch(ACTION_MOVE_BACK(move));
-      },
+      onNewMove: pos =>  dispatch(ACTION_ONE_MOVE(pos)),
+      onNewGame: () => { dispatch(ACTION_NEW_GAME()) },
+      onBackMove: () =>  dispatch(ACTION_MOVE_BACK()),
   }
 };
 
